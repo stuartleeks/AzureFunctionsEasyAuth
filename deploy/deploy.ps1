@@ -12,6 +12,10 @@ param(
     [Parameter(Mandatory=$true)]
     [string]
     $FunctionAppName,
+    # Name to use for the Web app
+    [Parameter(Mandatory=$true)]
+    [string]
+    $WebAppName,
     # The App ID for the facebook app to link this with
     [Parameter(Mandatory=$true)]
     [string]
@@ -23,7 +27,11 @@ param(
     # The URL to the webdeploy zip file for the 
     [Parameter()]
     [string]
-    $FunctionAppZipUri = "https://ci.appveyor.com/api/buildjobs/esy5k2mefus59kqd/artifacts/src%2FFunctionWithAuth%2Foutput%2FFunctionWithAuth.zip" # TODO move default to the template
+    $FunctionAppZipUri = "https://ci.appveyor.com/api/buildjobs/esy5k2mefus59kqd/artifacts/src%2FFunctionWithAuth%2Foutput%2FFunctionWithAuth.zip", # TODO move default to the template
+    # The URL to the webdeploy zip file for the 
+    [Parameter()]
+    [string]
+    $WebAppZipUri = "https://ci.appveyor.com/api/buildjobs/esy5k2mefus59kqd/artifacts/src%2FSimpleWebClient%2Foutput%2FSimpleWebClient.zip" # TODO move default to the template
 
 )
 
@@ -42,8 +50,10 @@ New-AzureRmResourceGroupDeployment `
     -Name $deploymentName `
     -TemplateFile "$PSScriptRoot/azuredeploy.json" `
     -TemplateParameterObject @{
-        "functionAppName" = $FunctionAppName
         "facebookAppId" = $FacebookAppId
         "facebookAppSecret" = $FacebookAppSecret
+        "functionAppName" = $FunctionAppName
         "functionAppZipUri" = $FunctionAppZipUri
+        "webAppName" = $WebAppName
+        "webAppZipUri" = $WebAppZipUri
     }
