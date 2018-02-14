@@ -263,3 +263,5 @@ __pycache__/
 
 src/FunctionWithAuth/output/**
 src/SimpleWebClient/output/**
+
+**/PublishProfiles/**
