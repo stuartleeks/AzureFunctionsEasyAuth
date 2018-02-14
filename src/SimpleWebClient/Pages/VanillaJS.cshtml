@@ -5,8 +5,29 @@
     ViewData["Title"] = "Vanilla JS sample";
     var facebookAppId = Configuration["facebookAppId"];
     var functionAppBaseUrl = Configuration["functionAppBaseUrl"];
+    if (!functionAppBaseUrl.EndsWith("/"))
+    {
+        functionAppBaseUrl += "/";
 
+    }
 }
+<h1>Vanilla JS - sample client</h1>
+
+<div>
+    <fb:login-button scope="public_profile,email"
+                     onlogin="checkLoginState();">
+    </fb:login-button>
+</div>
+
+
+<div>
+    <h2>Log:</h2>
+    <button id="clearLog">Clear</button>
+    <div id="log"></div>
+</div>
+
+
+
 <script>
     @* Pull in the facebook JavaScript SDK: https://developers.facebook.com/docs/javascript/
     Other facebook SDKs: https://developers.facebook.com/docs/
@@ -18,7 +39,7 @@
             xfbml: true,
             version: 'v2.12'
         });
-        FB.AppEvents.logPageView();
+        //FB.AppEvents.logPageView();
     };
     (function (d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
@@ -33,15 +54,41 @@
     var easyAuthToken = null;
     var functionAppBaseUrl = '@functionAppBaseUrl';
     var functionUrl = functionAppBaseUrl + 'api/Function1?name=Alice';
+    var logElement = document.getElementById('log');
 
+    function clearLog() {
+        logElement.innerText = '';
+    }
+    function log(message) {
+        logElement.innerText += message + '\r\n';
+    }
+    function checkLoginState() {
+        FB.getLoginStatus(function (response) {
+            statusChangeCallback(response);
+        });
+    }
+    function translateFacebookAccessTokenToEasyAuthToken() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', functionAppBaseUrl + '.auth/login/facebook');
+        xhr.setRequestHeader('content-type', 'application/json');
+        xhr.setRequestHeader('accept', 'application/json')
+        xhr.onload = function () {
+            log('Go EasyAuth response:' + xhr.responseText);
+            var easyAuthResponse = JSON.parse(xhr.responseText);
+            easyAuthToken = easyAuthResponse.authenticationToken;
+        }
+        xhr.send(JSON.stringify({ 'access_token': accessToken }));
+    }
+    function statusChangeCallback(response) {
+        log('In facebook callback: ' + JSON.stringify(response));
+        if (response.authResponse.accessToken === undefined) {
+            log('Missing accessToken in facebook response');
+        } else {
+            accessToken = response.authResponse.accessToken;
+            translateFacebookAccessTokenToEasyAuthToken();
+        }
+    }
 
+    document.getElementById('clearLog').addEventListener('click', clearLog);
 
 </script>
-
-<h1>Vanilla JS - sample client</h1>
-
-<div>
-    <fb:login-button scope="public_profile,email"
-                     onlogin="checkLoginState();">
-    </fb:login-button>
-</div>
