@@ -27,11 +27,11 @@ param(
     # The URL to the webdeploy zip file for the 
     [Parameter()]
     [string]
-    $FunctionAppZipUri = "https://ci.appveyor.com/api/buildjobs/esy5k2mefus59kqd/artifacts/src%2FFunctionWithAuth%2Foutput%2FFunctionWithAuth.zip", # TODO move default to the template
+    $FunctionAppZipUri = "https://ci.appveyor.com/api/projects/stuartleeks/azurefunctionseasyauth/artifacts/src%2FFunctionWithAuth%2Foutput%2FFunctionWithAuth.zip", # TODO move default to the template
     # The URL to the webdeploy zip file for the 
     [Parameter()]
     [string]
-    $WebAppZipUri = "https://ci.appveyor.com/api/buildjobs/esy5k2mefus59kqd/artifacts/src%2FSimpleWebClient%2Foutput%2FSimpleWebClient.zip" # TODO move default to the template
+    $WebAppZipUri = "https://ci.appveyor.com/api/projects/stuartleeks/azurefunctionseasyauth/artifacts/src%2FSimpleWebClient%2Foutput%2FSimpleWebClient.zip" # TODO move default to the template
 
 )
 
