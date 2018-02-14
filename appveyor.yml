@@ -3,6 +3,8 @@ branches:
   only:
   - release
 image: Visual Studio 2017
+before_build:
+- ps: nuget restore src\AzureFunctionsEasyAuth.sln
 build:
   publish_wap: true
   verbosity: minimal
