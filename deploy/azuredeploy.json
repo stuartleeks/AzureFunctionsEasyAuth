@@ -10,7 +10,6 @@
         },
         "functionAppZipUri": {
             "type": "string",
-            "defaultValue": "TODO!",
             "metadata": {
                 "description": "URL to the zip file to deploy to the function app"
             }
