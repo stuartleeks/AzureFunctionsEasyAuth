@@ -1,0 +1,47 @@
+﻿@page
+@using  Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "Vanilla JS sample";
+    var facebookAppId = Configuration["facebookAppId"];
+    var functionAppBaseUrl = Configuration["functionAppBaseUrl"];
+
+}
+<script>
+    @* Pull in the facebook JavaScript SDK: https://developers.facebook.com/docs/javascript/
+    Other facebook SDKs: https://developers.facebook.com/docs/
+    *@
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: '@facebookAppId',
+            cookie: true,
+            xfbml: true,
+            version: 'v2.12'
+        });
+        FB.AppEvents.logPageView();
+    };
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) { return; }
+        js = d.createElement(s); js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+
+    var accessToken = null;
+    var easyAuthToken = null;
+    var functionAppBaseUrl = '@functionAppBaseUrl';
+    var functionUrl = functionAppBaseUrl + 'api/Function1?name=Alice';
+
+
+
+</script>
+
+<h1>Vanilla JS - sample client</h1>
+
+<div>
+    <fb:login-button scope="public_profile,email"
+                     onlogin="checkLoginState();">
+    </fb:login-button>
+</div>

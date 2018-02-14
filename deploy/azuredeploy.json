@@ -1,0 +1,161 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "functionAppName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name for the Function App to create"
+            }
+        },
+        "functionAppZipUri": {
+            "type": "string",
+            "defaultValue": "TODO!",
+            "metadata": {
+                "description": "URL to the zip file to deploy to the function app"
+            }
+        },
+        "facebookAppId": {
+            "type": "string"
+        },
+        "facebookAppSecret": {
+            "type": "securestring"
+        }
+    },
+    "variables": {
+        "functionAppPlanName": "[concat(parameters('functionAppName'), 'plan')]",
+        "storageAccountName": "[concat('azfunctions', uniquestring(resourceGroup().id))]",
+        "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+    },
+    "resources": [
+        /* Function App with consumption/dynamic plan and storage account - TODO, add app insights */
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2017-06-01",
+            "name": "[variables('storageAccountName')]",
+            "tags": {
+                "displayName": "StorageAccount"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2016-09-01",
+            "name": "[variables('functionAppPlanName')]",
+            "tags": {
+                "displayName": "AppServicePlan"
+            },
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+            },
+            "kind": "functionapp",
+            "dependsOn": [],
+            "properties": {
+                "name": "[variables('functionAppPlanName')]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "name": "[parameters('functionAppName')]",
+            "tags": {
+                "displayName": "FunctionApp"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('functionAppPlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('functionAppPlanName'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[toLower(parameters('functionAppName'))]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~1"
+                        },
+                        {
+                            "Name": "BASE_ARCHITECTURE_VERSION",
+                            "Value": "1.1.0"
+                        }
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "apiVersion": "2016-08-01",
+                    "name": "appsettings",
+                    "type": "config",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('functionAppName'))]"
+                    ],
+                    "properties": {
+                        "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]",
+                        "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]",
+                        "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]",
+                        "WEBSITE_CONTENTSHARE": "[toLower(parameters('functionAppName'))]",
+                        "FUNCTIONS_EXTENSION_VERSION": "~1",
+                        "BASE_ARCHITECTURE_VERSION": "1.1.0"
+                    }
+                },
+                { 
+                    "apiVersion": "2016-08-01",
+                    "name": "authsettings",
+                    "type": "config",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('functionAppName'))]"
+                    ],
+                    "properties": {
+                        "enabled" : true,
+                        "tokenStoreEnabled" : true,
+                        "unauthenticatedClientAction" : "AllowAnonymous",
+                        "facebookAppId" : "[parameters('facebookAppId')]",
+                        "facebookAppSecret" : "[parameters('facebookAppSecret')]"
+                    }
+                },
+                {
+                    "type": "extensions",
+                    "name": "MSDeploy",
+                    "apiVersion": "2016-08-01",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites/', parameters('functionAppName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "DeployTheZip"
+                    },
+                    "properties": {
+                        "packageUri": "[parameters('functionAppZipUri')]"
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {}
+}
