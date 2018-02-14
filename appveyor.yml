@@ -5,6 +5,13 @@ branches:
 image: Visual Studio 2017
 before_build:
 - ps: nuget restore src\AzureFunctionsEasyAuth.sln
-build:
-  publish_wap: true
-  verbosity: minimal
+build_script:
+- ps: dotnet msbuild src /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation=output
+artifacts:
+- path: src/SimpleWebClient/output/SimpleWebClient.zip
+  name: SimpleWebClient.zip
+  type: WebDeployPackage
+- path: src/FunctionWithAuth/output/FunctionWithAuth.zip
+  name: FunctionWithAuth.zip
+  type: WebDeployPackage
+  
