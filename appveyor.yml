@@ -1,0 +1,8 @@
+version: 1.0.{build}
+branches:
+  only:
+  - release
+image: Visual Studio 2017
+build:
+  publish_wap: true
+  verbosity: minimal
