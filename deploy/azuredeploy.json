@@ -122,6 +122,24 @@
                         "facebookAppId": "[parameters('facebookAppId')]",
                         "facebookAppSecret": "[parameters('facebookAppSecret')]"
                     }
+                },                {
+                    "apiVersion": "2016-08-01",
+                    "name": "web",
+                    "type": "config",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('functionAppName'))]",
+                        "[resourceId('Microsoft.Web/Sites', parameters('webAppName'))]"
+                    ],
+                    "properties": {
+                        "cors": {
+                            "allowedOrigins": [
+                              "https://functions.azure.com",
+                              "https://functions-staging.azure.com",
+                              "https://functions-next.azure.com",
+                              "[concat('https://',reference(resourceId('Microsoft.Web/sites', parameters('webAppName'))).hostNames[0])]"
+                            ]
+                          }
+                    }
                 },
                 {
                     "type": "extensions",
@@ -131,7 +149,8 @@
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites/', parameters('functionAppName'))]",
                         "[resourceId('Microsoft.Web/sites/config', parameters('functionAppName'), 'appsettings')]",
-                        "[resourceId('Microsoft.Web/sites/config', parameters('functionAppName'), 'authsettings')]"
+                        "[resourceId('Microsoft.Web/sites/config', parameters('functionAppName'), 'authsettings')]",
+                        "[resourceId('Microsoft.Web/sites/config', parameters('functionAppName'), 'web')]"
                     ],
                     "tags": {
                         "displayName": "DeployTheZip"
@@ -221,7 +240,8 @@
                         "displayName": "DeployTheZip"
                     },
                     "properties": {
-                        "packageUri": "[parameters('webAppZipUri')]"
+                        "packageUri": "[parameters('webAppZipUri')]",
+                        "AppOffline": true
                     }
                 }
             ]
