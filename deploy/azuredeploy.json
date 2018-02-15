@@ -241,7 +241,7 @@
                     },
                     "properties": {
                         "packageUri": "[parameters('webAppZipUri')]",
-                        "AppOffline": true
+                        "AppOffline": true /* options here: https://github.com/Azure/azure-rest-api-specs/blob/master/specification/web/resource-manager/Microsoft.Web/stable/2016-08-01/WebApps.json#L15929 */
                     }
                 }
             ]

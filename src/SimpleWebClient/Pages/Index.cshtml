@@ -1,13 +1,124 @@
 ﻿@page
+@using  Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Vanilla JS sample";
+    var facebookAppId = Configuration["facebookAppId"];
+    var functionAppBaseUrl = Configuration["functionAppBaseUrl"];
+    if (!functionAppBaseUrl.EndsWith("/"))
+    {
+        functionAppBaseUrl += "/";
+
+    }
 }
+<h1>Vanilla JS - sample client</h1>
 
-<h1>Sample Web Client</h1>
+<div>
+    <fb:login-button scope="public_profile,email"
+                     auto-logout-link="true"
+                     onlogin="onFacebookLogin();">
+    </fb:login-button>
+</div>
+<div>
+    <button id="testIsAuthenticated">TestIsAuthenticated</button>
+</div>
 
-This project contains two implementations of web clients to demonstrate how to authenticate with an Azure Function via EasyAuth:
+<div>
+    <h2>Log:</h2>
+    <button id="clearLog">Clear</button>
+    <div id="log"></div>
+</div>
 
-<ul>
-    <li><a href="VanillaJS">Using vanilla JS</a></li>
-    <li><a href="">Using Mobile Services JS SDK</a></li>
-</ul>
+
+
+<script>
+    @* Pull in the facebook JavaScript SDK: https://developers.facebook.com/docs/javascript/
+    Other facebook SDKs: https://developers.facebook.com/docs/
+    *@
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: '@facebookAppId',
+            cookie: true,
+            xfbml: true,
+            version: 'v2.12'
+        });
+        FB.getLoginStatus(function (response) {
+            statusChangeCallback(response);
+        });
+    };
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) { return; }
+        js = d.createElement(s); js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+
+    var accessToken = null;
+    var easyAuthToken = null;
+    var functionAppBaseUrl = '@functionAppBaseUrl';
+    var logElement = document.getElementById('log');
+
+    function clearLog() {
+        logElement.innerText = '';
+    }
+    function log(message) {
+        logElement.innerText += message + '\r\n';
+    }
+    function onFacebookLogin() {
+        FB.getLoginStatus(function (response) {
+            statusChangeCallback(response);
+        });
+    }
+    function statusChangeCallback(response) {
+        log('In facebook callback: ' + JSON.stringify(response));
+        if (response.status.toLowerCase() === 'connected') {
+            accessToken = response.authResponse.accessToken;
+            // Call function app to translate facebook token to EasyAuthToken
+            jsonApi(
+                'POST',
+                functionAppBaseUrl + '.auth/login/facebook',
+                { 'access_token': accessToken },
+                null,
+                function () {
+                    log('EasyAuth response:' + this.responseText);
+                    var easyAuthResponse = JSON.parse(this.responseText);
+                    easyAuthToken = easyAuthResponse.authenticationToken;
+                }
+            );
+        } else {
+            accessToken = null;
+            easyAuthToken = null;
+        } 
+    }
+    function callIsAuthenticated() {
+        jsonApi(
+            'GET',
+            functionAppBaseUrl + "api/IsAuthenticated",
+            null,
+            { 'X-ZUMO-AUTH' : easyAuthToken },
+            function () {
+                log(`Response from IsAuthenticated: ${this.responseText}`);
+            }
+        );
+    }
+    function jsonApi(method, url, body, headers, handler) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+        xhr.setRequestHeader('content-type', 'application/json');
+        xhr.setRequestHeader('accept', 'application/json')
+        for (header in headers) {
+            xhr.setRequestHeader(header, headers[header]);
+        }
+        xhr.onload = handler
+        if (body !== undefined && body !== null && typeof (body) !== 'string') {
+            body = JSON.stringify(body);
+        }
+        xhr.send(body);
+    }
+
+    document.getElementById('clearLog').addEventListener('click', clearLog);
+    document.getElementById('testIsAuthenticated').addEventListener('click', callIsAuthenticated);
+
+</script>
