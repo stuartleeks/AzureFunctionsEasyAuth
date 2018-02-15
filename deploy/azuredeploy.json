@@ -11,10 +11,9 @@
         "webAppName": {
             "type": "string",
             "metadata": {
-                "description": "Name for the Function App to create"
+                "description": "Name for the Web App to create"
             }
         },
-
         "facebookAppId": {
             "type": "string"
         },
