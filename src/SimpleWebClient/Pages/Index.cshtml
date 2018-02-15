@@ -22,6 +22,8 @@
 <div>
     <button id="testIsAuthenticated">Test Authenticated</button>
     <button id="getClaims">Get Claims</button>
+    <button id="getAuthInfo">Get Auth Info</button>
+    <button id="getEmail">Get Email</button>
 </div>
 
 <div>
@@ -77,11 +79,16 @@
         if (response.status.toLowerCase() === 'connected') {
             accessToken = response.authResponse.accessToken;
             // Call function app to translate facebook token to EasyAuthToken
-            jsonApi(
-                'POST',
-                functionAppBaseUrl + '.auth/login/facebook',
-                { 'access_token': accessToken },
-                null,
+            sendRequest(
+                {
+                    method: 'POST',
+                    url: functionAppBaseUrl + '.auth/login/facebook',
+                    headers: {
+                        'accept': 'application/json',
+                        'content-type': 'application/json',
+                    },
+                    body: { 'access_token': accessToken }
+                },
                 function () {
                     log('EasyAuth response:' + this.responseText);
                     var easyAuthResponse = JSON.parse(this.responseText);
@@ -91,39 +98,80 @@
         } else {
             accessToken = null;
             easyAuthToken = null;
-        } 
+        }
     }
     function callIsAuthenticated() {
-        jsonApi(
-            'GET',
-            functionAppBaseUrl + "api/IsAuthenticated",
-            null,
-            { 'X-ZUMO-AUTH': easyAuthToken },
+        sendRequest(
+            {
+                method: 'GET',
+                url: functionAppBaseUrl + "api/IsAuthenticated",
+                headers: {
+                    'accept': 'application/json',
+                    'content-type': 'application/json',
+                    'X-ZUMO-AUTH': easyAuthToken
+                },
+            },
             function () {
                 log(`Response from IsAuthenticated: ${this.responseText}`);
             }
         );
     }
     function callGetClaims() {
-        jsonApi(
-            'GET',
-            functionAppBaseUrl + "api/GetClaims",
-            null,
-            { 'X-ZUMO-AUTH': easyAuthToken },
+        sendRequest(
+            {
+                method: 'GET',
+                url: functionAppBaseUrl + "api/GetClaims",
+                headers: {
+                    'accept': 'application/json',
+                    'content-type': 'application/json',
+                    'X-ZUMO-AUTH': easyAuthToken
+                },
+            },
             function () {
                 log(`Response from GetClaims: ${this.responseText}`);
             }
         );
     }
-    function jsonApi(method, url, body, headers, handler) {
+    function callGetAuthInfo() {
+        sendRequest(
+            {
+                method: 'GET',
+                url: functionAppBaseUrl + "api/GetAuthInfo",
+                headers: {
+                    'accept': 'application/json',
+                    'content-type': 'application/json',
+                    'X-ZUMO-AUTH': easyAuthToken
+                },
+            },
+            function () {
+                log(`Response from GetAuthInfo: ${this.responseText}`);
+            }
+        );
+    }
+    function callGetEmail() {
+        sendRequest(
+            {
+                method: 'GET',
+                url: functionAppBaseUrl + "api/GetEmailClaim",
+                headers: {
+                    'accept': 'application/json',
+                    'content-type': 'application/json',
+                    'X-ZUMO-AUTH': easyAuthToken
+                },
+            },
+            function () {
+                log(`Response from GetEmail: ${this.responseText}`);
+            }
+        );
+    }
+    function sendRequest(options, handler) {
         var xhr = new XMLHttpRequest();
-        xhr.open(method, url);
-        xhr.setRequestHeader('content-type', 'application/json');
-        xhr.setRequestHeader('accept', 'application/json')
-        for (header in headers) {
-            xhr.setRequestHeader(header, headers[header]);
+        xhr.open(options.method, options.url);
+        for (header in options.headers) {
+            xhr.setRequestHeader(header, options.headers[header]);
         }
         xhr.onload = handler
+        var body = options.body;
         if (body !== undefined && body !== null && typeof (body) !== 'string') {
             body = JSON.stringify(body);
         }
@@ -133,5 +181,7 @@
     document.getElementById('clearLog').addEventListener('click', clearLog);
     document.getElementById('testIsAuthenticated').addEventListener('click', callIsAuthenticated);
     document.getElementById('getClaims').addEventListener('click', callGetClaims);
+    document.getElementById('getAuthInfo').addEventListener('click', callGetAuthInfo);
+    document.getElementById('getEmail').addEventListener('click', callGetEmail);
 
 </script>
