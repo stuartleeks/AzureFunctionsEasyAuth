@@ -27,11 +27,11 @@ param(
     # The URL to the webdeploy zip file for the 
     [Parameter()]
     [string]
-    $FunctionAppZipUri = "https://ci.appveyor.com/api/projects/stuartleeks/azurefunctionseasyauth/artifacts/src%2FFunctionWithAuth%2Foutput%2FFunctionWithAuth.zip", # TODO move default to the template
+    $FunctionAppZipUri = $null,
     # The URL to the webdeploy zip file for the 
     [Parameter()]
     [string]
-    $WebAppZipUri = "https://ci.appveyor.com/api/projects/stuartleeks/azurefunctionseasyauth/artifacts/src%2FSimpleWebClient%2Foutput%2FSimpleWebClient.zip" # TODO move default to the template
+    $WebAppZipUri = $null
 
 )
 
@@ -45,15 +45,20 @@ if ($resourceGroup -eq $null){
 
 $deploymentName = "Deployment-$(Get-Date -f "yyyyMMdd_HHmmss")" # Name the deployments for ease of referring back/debugging
 Write-Host "Creating deployment '$deploymentName'"
+$parameters = @{
+    "facebookAppId" = $FacebookAppId
+    "facebookAppSecret" = $FacebookAppSecret
+    "functionAppName" = $FunctionAppName
+    "webAppName" = $WebAppName
+}
+if($FunctionAppZipUri -ne $null){
+    $parameters["functionAppZipUri"] = $FunctionAppZipUri
+}
+if($WebAppZipUri -ne $null){
+    $parameters["webAppZipUri"] = $WebAppZipUri
+}
 New-AzureRmResourceGroupDeployment `
     -ResourceGroupName $ResourceGroupName `
     -Name $deploymentName `
     -TemplateFile "$PSScriptRoot/azuredeploy.json" `
-    -TemplateParameterObject @{
-        "facebookAppId" = $FacebookAppId
-        "facebookAppSecret" = $FacebookAppSecret
-        "functionAppName" = $FunctionAppName
-        "functionAppZipUri" = $FunctionAppZipUri
-        "webAppName" = $WebAppName
-        "webAppZipUri" = $WebAppZipUri
-    }
+    -TemplateParameterObject $parameters

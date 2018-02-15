@@ -8,29 +8,32 @@
                 "description": "Name for the Function App to create"
             }
         },
-        "functionAppZipUri": {
-            "type": "string",
-            "metadata": {
-                "description": "URL to the zip file to deploy to the function app"
-            }
-        },
         "webAppName": {
             "type": "string",
             "metadata": {
                 "description": "Name for the Function App to create"
             }
         },
-        "webAppZipUri": {
-            "type": "string",
-            "metadata": {
-                "description": "URL to the zip file to deploy to the function app"
-            }
-        },
+
         "facebookAppId": {
             "type": "string"
         },
         "facebookAppSecret": {
             "type": "securestring"
+        },
+        "functionAppZipUri": {
+            "type": "string",
+            "metadata": {
+                "description": "URL to the zip file to deploy to the function app. Leave as the default unless you want to deploy a custom build"
+            },
+            "defaultValue": "https://ci.appveyor.com/api/projects/stuartleeks/azurefunctionseasyauth/artifacts/src%2FFunctionWithAuth%2Foutput%2FFunctionWithAuth.zip"
+        },
+        "webAppZipUri": {
+            "type": "string",
+            "metadata": {
+                "description": "URL to the zip file to deploy to the web app. Leave as the default unless you want to deploy a custom build"
+            },
+            "defaultValue": "https://ci.appveyor.com/api/projects/stuartleeks/azurefunctionseasyauth/artifacts/src%2FSimpleWebClient%2Foutput%2FSimpleWebClient.zip"
         }
     },
     "variables": {
