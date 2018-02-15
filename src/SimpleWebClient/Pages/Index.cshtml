@@ -20,7 +20,8 @@
     </fb:login-button>
 </div>
 <div>
-    <button id="testIsAuthenticated">TestIsAuthenticated</button>
+    <button id="testIsAuthenticated">Test Authenticated</button>
+    <button id="getClaims">Get Claims</button>
 </div>
 
 <div>
@@ -97,9 +98,20 @@
             'GET',
             functionAppBaseUrl + "api/IsAuthenticated",
             null,
-            { 'X-ZUMO-AUTH' : easyAuthToken },
+            { 'X-ZUMO-AUTH': easyAuthToken },
             function () {
                 log(`Response from IsAuthenticated: ${this.responseText}`);
+            }
+        );
+    }
+    function callGetClaims() {
+        jsonApi(
+            'GET',
+            functionAppBaseUrl + "api/GetClaims",
+            null,
+            { 'X-ZUMO-AUTH': easyAuthToken },
+            function () {
+                log(`Response from GetClaims: ${this.responseText}`);
             }
         );
     }
@@ -120,5 +132,6 @@
 
     document.getElementById('clearLog').addEventListener('click', clearLog);
     document.getElementById('testIsAuthenticated').addEventListener('click', callIsAuthenticated);
+    document.getElementById('getClaims').addEventListener('click', callGetClaims);
 
 </script>
