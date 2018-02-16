@@ -8,3 +8,10 @@ body {
     padding-left: 15px;
     padding-right: 15px;
 }
+
+.login-provider {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 1em;
+    margin-right: 1em;
+}
