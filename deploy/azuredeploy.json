@@ -18,25 +18,29 @@
             "type": "string",
             "metadata": {
                 "description": "Include facebookAppId and facebookAppSecret to enable facebook authentication"
-            }
+            },
+            "defaultValue": ""
         },
         "facebookAppSecret": {
             "type": "securestring",
             "metadata": {
                 "description": "Include facebookAppId and facebookAppSecret to enable facebook authentication"
-            }
+            },
+            "defaultValue": ""
         },
         "googleClientId": {
             "type": "string",
             "metadata": {
                 "description": "Include googleClientId and googleClientSecret to enable google authentication"
-            }
+            },
+            "defaultValue": ""            
         },
         "googleClientSecret": {
             "type": "securestring",
             "metadata": {
                 "description": "Include googleClientId and googleClientSecret to enable google authentication"
-            }
+            },
+            "defaultValue": ""
         },
         "functionAppZipUri": {
             "type": "string",
