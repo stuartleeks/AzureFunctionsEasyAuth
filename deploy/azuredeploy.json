@@ -15,10 +15,28 @@
             }
         },
         "facebookAppId": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "Include facebookAppId and facebookAppSecret to enable facebook authentication"
+            }
         },
         "facebookAppSecret": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+                "description": "Include facebookAppId and facebookAppSecret to enable facebook authentication"
+            }
+        },
+        "googleClientId": {
+            "type": "string",
+            "metadata": {
+                "description": "Include googleClientId and googleClientSecret to enable google authentication"
+            }
+        },
+        "googleClientSecret": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Include googleClientId and googleClientSecret to enable google authentication"
+            }
         },
         "functionAppZipUri": {
             "type": "string",
@@ -122,7 +140,9 @@
                         "tokenStoreEnabled": true,
                         "unauthenticatedClientAction": "AllowAnonymous",
                         "facebookAppId": "[parameters('facebookAppId')]",
-                        "facebookAppSecret": "[parameters('facebookAppSecret')]"
+                        "facebookAppSecret": "[parameters('facebookAppSecret')]",
+                        "googleAppId": "[parameters('googleClientId')]",
+                        "googleAppSecret": "[parameters('googleClientSecret')]"
                     }
                 },                {
                     "apiVersion": "2016-08-01",

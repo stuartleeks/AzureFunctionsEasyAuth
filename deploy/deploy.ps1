@@ -17,13 +17,21 @@ param(
     [string]
     $WebAppName,
     # The App ID for the facebook app to link this with
-    [Parameter(Mandatory=$true)]
+    [Parameter()]
     [string]
     $FacebookAppId,
     # The App Secret for the facebook app to link this with
-    [Parameter(Mandatory=$true)]
+    [Parameter()]
     [string]
     $FacebookAppSecret,
+    # The Client ID for the Google app to link this with
+    [Parameter()]
+    [string]
+    $GoogleClientId,
+    # The Client Secret for the Google app to link this with
+    [Parameter()]
+    [string]
+    $GoogleClientSecret,
     # The URL to the webdeploy zip file for the 
     [Parameter()]
     [string]
@@ -46,10 +54,12 @@ if ($resourceGroup -eq $null){
 $deploymentName = "Deployment-$(Get-Date -f "yyyyMMdd_HHmmss")" # Name the deployments for ease of referring back/debugging
 Write-Host "Creating deployment '$deploymentName'"
 $parameters = @{
-    "facebookAppId" = $FacebookAppId
-    "facebookAppSecret" = $FacebookAppSecret
     "functionAppName" = $FunctionAppName
     "webAppName" = $WebAppName
+    "facebookAppId" = $FacebookAppId
+    "facebookAppSecret" = $FacebookAppSecret
+    "googleClientId" = $GoogleClientId
+    "googleClientSecret" = $GoogleClientSecret
 }
 if($FunctionAppZipUri -ne $null){
     $parameters["functionAppZipUri"] = $FunctionAppZipUri
