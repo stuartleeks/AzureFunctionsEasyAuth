@@ -215,21 +215,6 @@
                     }
                 },
                 {
-                    "apiVersion": "2016-08-01",
-                    "name": "authsettings",
-                    "type": "config",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', parameters('webAppName'))]"
-                    ],
-                    "properties": {
-                        "enabled": true,
-                        "tokenStoreEnabled": true,
-                        "unauthenticatedClientAction": "AllowAnonymous",
-                        "facebookAppId": "[parameters('facebookAppId')]",
-                        "facebookAppSecret": "[parameters('facebookAppSecret')]"
-                    }
-                },
-                {
                     "type": "extensions",
                     "name": "MSDeploy",
                     "apiVersion": "2016-08-01",
