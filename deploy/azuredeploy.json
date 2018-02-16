@@ -235,6 +235,7 @@
                     "properties": {
                         "BASE_ARCHITECTURE_VERSION": "1.1.0",
                         "facebookAppId": "[parameters('facebookAppId')]",
+                        "googleClientId": "[parameters('googleClientId')]",
                         "functionAppBaseUrl": "[concat('https://',reference(resourceId('Microsoft.Web/sites', parameters('functionAppName'))).hostNames[0])]"
                     }
                 },
