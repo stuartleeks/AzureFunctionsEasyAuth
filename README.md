@@ -10,6 +10,43 @@ There are two projects in the solution:
  * src/FunctionWithAuth - this is the Azure Functions implementation
  * src/SampleWebClient - this is a sample client to make it easy to test the Azure Functions in an interactive way
 
+## Outline
+The rough outline for the sample is shown in the diagram below.
+
+The browser loads the HTML/JS/CSS for the Web App. The Web App uses the Facebook/Google JavaScript SDKs to authenticate with the identity provider. Once it has the token from the provider, it passes that to the EasyAuth endpoint on the Function App which translates it into an EasyAuth token. This EasyAuth token is then passed on calls to the Azure Function endpoints to call them as the authenticated user.
+
+```
++--------------------+            +--------------------+
+|                    |            |                    |
+|                    |            |                    |
+|                    +------------>  Azure             |
+|  Browser           |            |  Web App           |
+|                    |            |                    |
+|                    |            |                    |
++--------------------+            +--------------------+
+    |             |
+    |             |
+    |             |
+    |             |               +--------------------+
+    |             |               |                    |
+    |             |               |                    |
+    |             +--------------->  Azure             |
+    |                             |  Function          |
+    |                             |                    |
+    |                             |                    |
+    |                             +--------------------+
+    |
++---v----------------+
+|                    |
+|                    |
+|  Identity provider |
+|  e.g. Facebook,    |
+|  Google            |
+|                    |
++--------------------+
+
+```
+
 ## Deployment
 
 If you want a quick way to see the sample in action without deploying it yourself then visit https://easyauthweb.azurewebsites.net/.
