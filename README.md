@@ -1,7 +1,18 @@
 # AzureFunctionsEasyAuth
+
+Contents
+
+* [Intro](#intro)
+* [Projects](#projects)
+* [Outline](#outline)
+* [Deployment](#deployment)
+
+## Intro
 A repo with sample code for using Azure Functions with App Service Authentication ("EasyAuth")
 
 EasyAuth provides integration with a [number of authentication providers](https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-overview#documentation-and-additional-resources), but for simplicity this sample uses facebook integration.
+
+
 
 ## Projects
 
