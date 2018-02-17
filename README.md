@@ -79,6 +79,8 @@ To deploy the sample with Facebook and/or Google integration:
    1. Configure the Facebook application:
       * set the AppDomains to the domain for the web app
       * add a website and set the Site Url to the URL of the web app
-   2. Configure the Google application to set the Authorised JavaScript Origin
+   2. Configure the Google application to set the Authorised JavaScript Origin to the URL of the web app
+
+4. Go to the URL of the web app and test the application!
 
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fstuartleeks%2FAzureFunctionsEasyAuth%2Fmaster%2Fdeploy%2Fazuredeploy.json)
