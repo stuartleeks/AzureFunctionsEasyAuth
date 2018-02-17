@@ -62,13 +62,23 @@ The browser loads the HTML/JS/CSS for the Web App. The Web App uses the Facebook
 
 If you want a quick way to see the sample in action without deploying it yourself then visit https://easyauthweb.azurewebsites.net/.
 
-To deploy the sample
+To deploy the sample with Facebook and/or Google integration:
 
-1. Create a Facebook application at https://developers.facebook.com and make a note of the App ID and App Secret
-2. Deploy the [template](deploy/azuredeploy.json) (you can use the big deploy button below). When it has finished deploying, make note of the web app url
-3. Configure the Facebook application:
-    * set the AppDomains to the domain for the web app
-    * add a website and set the Site Url to the URL of the web app
+1. Create applications with one or both of the the identity providers
 
+   1. Create a Facebook application at https://developers.facebook.com and make a note of the App ID and App Secret
+   2. Create a Google application at https://developers.google.com/identity/sign-in/web/sign-in and make a note of the Client ID and Client Secret
+
+2. Deploy the [template](deploy/azuredeploy.json) (you can use the big deploy button below).
+
+    You can enter the ID + Secret for Facebook, Google, or both, dependending on what you configured above
+
+    When the template has finished deploying, make note of the web app url.
+
+3. Update the configuration with the identity providers
+   1. Configure the Facebook application:
+      * set the AppDomains to the domain for the web app
+      * add a website and set the Site Url to the URL of the web app
+   2. Configure the Google application to set the Authorised JavaScript Origin
 
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fstuartleeks%2FAzureFunctionsEasyAuth%2Fmaster%2Fdeploy%2Fazuredeploy.json)
