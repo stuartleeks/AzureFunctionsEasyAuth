@@ -67,11 +67,13 @@ namespace FunctionWithAuth
             HttpRequestMessage request,
             TraceWriter log)
         {
+            var id = Thread.CurrentPrincipal.Identity;
+            bool auth = id.IsAuthenticated;
             if (Thread.CurrentPrincipal.Identity.IsAuthenticated)
             {
                 var authInfo = await request.GetAuthInfoAsync();
                 // look up specific claim type, in this case the email claim (http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress)
-                var emailClaim = authInfo.GetClaim(ClaimTypes.Email);
+                var emailClaim = authInfo?.GetClaim(ClaimTypes.Email);
                 return request.CreateResponse(HttpStatusCode.OK, emailClaim?.Value, "application/json");
             }
             else
