@@ -25,35 +25,43 @@
 <h2>Sign in with:</h2>
 @if (useFacebook)
 {
-<div class="login-provider">
-    <h3>Facebook</h3>
-    <div>
-        <fb:login-button scope="public_profile,email"
-                         auto-logout-link="true"
-                         onlogin="onFacebookLogin();">
-        </fb:login-button>
+    <div class="login-provider">
+        <h3>Facebook</h3>
+        <div>
+            <fb:login-button scope="public_profile,email"
+                             auto-logout-link="true"
+                             onlogin="onFacebookLogin();">
+            </fb:login-button>
+        </div>
     </div>
-</div>
 }
 @if (useGoogle)
 {
-<div class="login-provider">
-    <h3>Google</h3>
-    <div>
-        @*<div class="g-signin2" data-onsuccess="onGoogleLogin"></div>*@
-        <div id="my-signin2"></div>
-        <a href="#" onclick="googleSignOut();">Sign out</a>
+    <div class="login-provider">
+        <h3>Google</h3>
+        <div>
+            @*<div class="g-signin2" data-onsuccess="onGoogleLogin"></div>*@
+            <div id="my-signin2"></div>
+            <a href="#" onclick="googleSignOut();">Sign out</a>
+        </div>
     </div>
-</div>
 }
 
 <h2>Call Azure Functions:</h2>
-
+The following actions call into our deployed Azure Functions:
 <div>
     <button id="testIsAuthenticated">Test Authenticated</button>
     <button id="getClaims">Get Claims</button>
     <button id="getAuthInfo">Get Auth Info</button>
     <button id="getEmail">Get Email</button>
+</div>
+
+
+<h2>Call EasyAuth:</h2>
+The following actions call into the EasyAuth endpoints:
+<div>
+    <button id="callAuthMe">.auth/me</button>
+    <button id="callAuthLogout">.auth/logout</button>
 </div>
 
 <div>
@@ -114,7 +122,6 @@
         }
         </text>
     }
-/**/
     @if (useGoogle)
     {
         @* docs: https://developers.google.com/identity/sign-in/web/build-button
@@ -145,7 +152,7 @@
             });
             clearEasyAuth('google');
         }
-    </text>
+        </text>
     }
 
     var logElement = document.getElementById('log');
@@ -244,6 +251,38 @@
             }
         );
     }
+    function callAuthMe() {
+        sendRequest(
+            {
+                method: 'GET',
+                url: functionAppBaseUrl + ".auth/me",
+                headers: {
+                    'accept': 'application/json',
+                    'content-type': 'application/json',
+                    'X-ZUMO-AUTH': getEasyAuthToken()
+                },
+            },
+            function () {
+                log(`Response from .auth/me: ${this.responseText}`);
+            }
+        );
+    }
+    function callAuthLogout() {
+        sendRequest(
+            {
+                method: 'GET',
+                url: functionAppBaseUrl + ".auth/logout",
+                headers: {
+                    'accept': 'application/json',
+                    'content-type': 'application/json',
+                    'X-ZUMO-AUTH': getEasyAuthToken()
+                },
+            },
+            function () {
+                log('called .auth/logout');
+            }
+        );
+    }
     function sendRequest(options, handler) {
         var xhr = new XMLHttpRequest();
         xhr.open(options.method, options.url);
@@ -263,6 +302,8 @@
     document.getElementById('getClaims').addEventListener('click', callGetClaims);
     document.getElementById('getAuthInfo').addEventListener('click', callGetAuthInfo);
     document.getElementById('getEmail').addEventListener('click', callGetEmail);
+    document.getElementById('callAuthMe').addEventListener('click', callAuthMe);
+    document.getElementById('callAuthLogout').addEventListener('click', callAuthLogout);
 
 </script>
 @if (useGoogle)
