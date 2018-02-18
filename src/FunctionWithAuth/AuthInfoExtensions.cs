@@ -8,6 +8,8 @@ namespace FunctionWithAuth
 {
     public static class AuthInfoExtensions
     {
+        private static HttpClient _httpClient = new HttpClient();
+
         public static AuthUserClaim GetClaim(this AuthInfo authInfo, string claimType)
         {
             return authInfo.UserClaims.FirstOrDefault(c => c.Type == claimType);
@@ -15,10 +17,6 @@ namespace FunctionWithAuth
 
         public static async Task<AuthInfo> GetAuthInfoAsync(this HttpRequestMessage request)
         {
-            var client = new HttpClient(); // TODO - reuse. Need to send headers as part of request rather than using DefaultRequestHeaders
-                                           //client.DefaultRequestHeaders.Add("X-ZUMO-AUTH", GetRequestZumoAuthToken(req));
-                                           //var response = await client.GetAsync(GetAuthMeEndpoint());
-
             string zumoAuthToken = request.GetZumoAuthToken();
             if (string.IsNullOrEmpty(zumoAuthToken))
             {
@@ -31,9 +29,9 @@ namespace FunctionWithAuth
                             { "X-ZUMO-AUTH", zumoAuthToken }
                         }
             };
-            var response = await client.SendAsync(authMeRequest);
+            var response = await _httpClient.SendAsync(authMeRequest);
             var authInfoArray = await response.Content.ReadAsAsync<AuthInfo[]>();
-            return authInfoArray[0]; // The .auth/me content is a single item array
+            return authInfoArray.Length > 1 ? authInfoArray[0] : null; // The .auth/me content is a single item array if it is populated
         }
         private static string GetEasyAuthEndpoint()
         {
