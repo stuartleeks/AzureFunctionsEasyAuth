@@ -31,7 +31,7 @@ namespace FunctionWithAuth
             };
             var response = await _httpClient.SendAsync(authMeRequest);
             var authInfoArray = await response.Content.ReadAsAsync<AuthInfo[]>();
-            return authInfoArray.Length > 1 ? authInfoArray[0] : null; // The .auth/me content is a single item array if it is populated
+            return authInfoArray.Length >= 1 ? authInfoArray[0] : null; // The .auth/me content is a single item array if it is populated
         }
         private static string GetEasyAuthEndpoint()
         {
