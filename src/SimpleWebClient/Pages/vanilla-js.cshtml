@@ -111,7 +111,7 @@ The following actions call into the EasyAuth endpoints:
         }(document, 'script', 'facebook-jssdk'));
         function onFacebookLogin() {
             FB.getLoginStatus(function (response) {
-                log('In facebook callback: ' + JSON.stringify(response));
+                log(`In facebook callback: ${JSON.stringify(response)}`);
                 if (response === undefined || response.status.toLowerCase() === 'connected') {
                     var accessToken = response.authResponse.accessToken;
                     translateAuthToken('facebook', { 'access_token': accessToken });
@@ -144,7 +144,7 @@ The following actions call into the EasyAuth endpoints:
         function onGoogleLogin(googleUser) {
             console.log(googleUser.getAuthResponse());
             var id_token = googleUser.getAuthResponse().id_token;
-            translateAuthToken('google', { id_token: id_token });
+            translateAuthToken('google', { 'id_token': id_token });
         };
         function googleSignOut() {
             var auth2 = gapi.auth2.getAuthInstance();
@@ -177,7 +177,7 @@ The following actions call into the EasyAuth endpoints:
                 body: body
             },
             function () {
-                log('EasyAuth response:' + this.responseText);
+                log(`EasyAuth response (${provider}): ${this.responseText}`);
                 var easyAuthResponse = JSON.parse(this.responseText);
                 easyAuthInfo =
                     {
@@ -192,7 +192,7 @@ The following actions call into the EasyAuth endpoints:
         sendRequest(
             {
                 method: 'GET',
-                url: functionAppBaseUrl + "api/IsAuthenticated",
+                url: `${functionAppBaseUrl}api/IsAuthenticated`,
                 headers: {
                     'accept': 'application/json',
                     'content-type': 'application/json',
@@ -208,7 +208,7 @@ The following actions call into the EasyAuth endpoints:
         sendRequest(
             {
                 method: 'GET',
-                url: functionAppBaseUrl + "api/GetClaims",
+                url: `${functionAppBaseUrl}api/GetClaims`,
                 headers: {
                     'accept': 'application/json',
                     'content-type': 'application/json',
@@ -224,7 +224,7 @@ The following actions call into the EasyAuth endpoints:
         sendRequest(
             {
                 method: 'GET',
-                url: functionAppBaseUrl + "api/GetAuthInfo",
+                url: `${functionAppBaseUrl}api/GetAuthInfo`,
                 headers: {
                     'accept': 'application/json',
                     'content-type': 'application/json',
@@ -240,7 +240,7 @@ The following actions call into the EasyAuth endpoints:
         sendRequest(
             {
                 method: 'GET',
-                url: functionAppBaseUrl + "api/GetEmailClaim",
+                url: `${functionAppBaseUrl}api/GetEmailClaim`,
                 headers: {
                     'accept': 'application/json',
                     'content-type': 'application/json',
@@ -256,7 +256,7 @@ The following actions call into the EasyAuth endpoints:
         sendRequest(
             {
                 method: 'GET',
-                url: functionAppBaseUrl + ".auth/me",
+                url: `${functionAppBaseUrl}.auth/me`,
                 headers: {
                     'accept': 'application/json',
                     'content-type': 'application/json',
@@ -272,7 +272,7 @@ The following actions call into the EasyAuth endpoints:
         sendRequest(
             {
                 method: 'GET',
-                url: functionAppBaseUrl + ".auth/logout",
+                url: `${functionAppBaseUrl}.auth/logout`,
                 headers: {
                     'accept': 'application/json',
                     'content-type': 'application/json',

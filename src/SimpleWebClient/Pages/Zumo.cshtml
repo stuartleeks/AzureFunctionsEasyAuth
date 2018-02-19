@@ -99,14 +99,14 @@ The following actions call into the EasyAuth endpoints:
         }(document, 'script', 'facebook-jssdk'));
         function onFacebookLogin() {
             FB.getLoginStatus(function (response) {
-                log('In facebook callback: ' + JSON.stringify(response));
+                log(`In facebook callback: ${JSON.stringify(response)}`);
                 if (response === undefined || response.status.toLowerCase() === 'connected') {
                     var accessToken = response.authResponse.accessToken;
-                    mobileClient.login('facebook', { "access_token": accessToken }, false)
+                    mobileClient.login('facebook', { 'access_token': accessToken }, false)
                         .then(function () {
-                            console.log("TODO - could enable/disable functionality etc")
+                            console.log('TODO - could enable/disable functionality etc')
                         }, function (error) {
-                            console.log("ERROR: " + error);
+                            console.log(`ERROR: ${error}`);
                         });
                 } else {
                     // TODO - think about how to handle FB logout vs page load when logged out
@@ -136,11 +136,11 @@ The following actions call into the EasyAuth endpoints:
         function onGoogleLogin(googleUser) {
             console.log(googleUser.getAuthResponse());
             var id_token = googleUser.getAuthResponse().id_token;
-            mobileClient.login('google', { id_token: id_token }, false)
+            mobileClient.login('google', { 'id_token': id_token }, false)
                 .then(function () {
-                    console.log("TODO - could enable/disable functionality etc")
+                    console.log('TODO - could enable/disable functionality etc')
                 }, function (error) {
-                    console.log("ERROR: " + error);
+                    console.log(`ERROR: ${error}`);
                 });
         };
         function googleSignOut() {
@@ -161,7 +161,7 @@ The following actions call into the EasyAuth endpoints:
         logElement.innerText += message + '\r\n';
     }
     function callIsAuthenticated() {
-        mobileClient.invokeApi(functionAppBaseUrl + "api/IsAuthenticated",
+        mobileClient.invokeApi(`${functionAppBaseUrl}api/IsAuthenticated`,
             {
                 method: 'GET',
                 headers: {
@@ -176,7 +176,7 @@ The following actions call into the EasyAuth endpoints:
             });
     }
     function callGetClaims() {
-        mobileClient.invokeApi(functionAppBaseUrl + "api/GetClaims",
+        mobileClient.invokeApi(`${functionAppBaseUrl}api/GetClaims`,
             {
                 method: 'GET',
                 headers: {
@@ -191,7 +191,7 @@ The following actions call into the EasyAuth endpoints:
             });
     }
     function callGetAuthInfo() {
-        mobileClient.invokeApi(functionAppBaseUrl + "api/GetAuthInfo",
+        mobileClient.invokeApi(`${functionAppBaseUrl}api/GetAuthInfo`,
             {
                 method: 'GET',
                 headers: {
@@ -206,7 +206,7 @@ The following actions call into the EasyAuth endpoints:
             });
     }
     function callGetEmail() {
-        mobileClient.invokeApi(functionAppBaseUrl + "api/GetEmailClaim",
+        mobileClient.invokeApi(`${functionAppBaseUrl}api/GetEmailClaim`,
             {
                 method: 'GET',
                 headers: {
@@ -221,7 +221,7 @@ The following actions call into the EasyAuth endpoints:
             });
     }
     function callAuthMe() {
-        mobileClient.invokeApi(functionAppBaseUrl + ".auth/me",
+        mobileClient.invokeApi(`${functionAppBaseUrl}.auth/me`,
             {
                 method: 'GET',
                 headers: {
