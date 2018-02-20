@@ -145,8 +145,8 @@
                         "unauthenticatedClientAction": "AllowAnonymous",
                         "facebookAppId": "[parameters('facebookAppId')]",
                         "facebookAppSecret": "[parameters('facebookAppSecret')]",
-                        "googleAppId": "[parameters('googleClientId')]",
-                        "googleAppSecret": "[parameters('googleClientSecret')]"
+                        "googleClientId": "[parameters('googleClientId')]",
+                        "googleClientSecret": "[parameters('googleClientSecret')]"
                     }
                 },                {
                     "apiVersion": "2016-08-01",
