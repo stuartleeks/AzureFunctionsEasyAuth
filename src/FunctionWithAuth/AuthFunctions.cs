@@ -45,7 +45,7 @@ namespace FunctionWithAuth
         }
         [FunctionName("GetAuthInfo")]
         public static async Task<HttpResponseMessage> GetAuthInfo(
-                        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]
             HttpRequestMessage request,
             TraceWriter log)
         {
