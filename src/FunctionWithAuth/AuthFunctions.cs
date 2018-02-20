@@ -81,5 +81,24 @@ namespace FunctionWithAuth
                 return request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Not Authorized");
             }
         }
+
+        [FunctionName("GetAuthInfo_Binding")]
+        public static async Task<HttpResponseMessage> GetAuthInfo_Binding(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]
+            HttpRequestMessage request,
+            [BindAuthInfo]
+            AuthInfo authInfo,
+            TraceWriter log)
+        {
+            if (authInfo != null)
+            {
+                // Could use the authInfo here. For this sample, just return it!
+                return request.CreateResponse(HttpStatusCode.OK, authInfo, "application/json");
+            }
+            else
+            {
+                return request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Not Authorized");
+            }
+        }
     }
 }
