@@ -5,6 +5,9 @@
     ViewData["Title"] = "EasyAuth sample - with MobileServices SDK";
     var facebookAppId = Configuration["facebookAppId"];
     var googleClientId = Configuration["googleClientId"];
+    var aadb2cClientId = Configuration["aadb2cClientId"];
+    var aadb2cScopeString = Configuration["aadb2cScopes"];
+    var aadb2cAuthority = Configuration["aadb2cAuthority"];
     var functionAppBaseUrl = Configuration["functionAppBaseUrl"];
     if (!functionAppBaseUrl.EndsWith("/"))
     {
@@ -12,7 +15,11 @@
     }
     var useFacebook = !string.IsNullOrEmpty(facebookAppId);
     var useGoogle = !string.IsNullOrEmpty(googleClientId);
+    var useAadB2c = !string.IsNullOrEmpty(aadb2cClientId);
 }
+<script>
+        var aadb2cRedirectUri = `${location.origin}/zumo`;
+</script>
 @section Head {
     @if (useGoogle)
     {
@@ -46,6 +53,17 @@
     </div>
 </div>
 }
+@if(useAadB2c)
+{
+<div class="login-provider">
+    <h3>Azure Active Directory B2C</h3>
+    <div>
+        <button onclick="aadb2cLogin();">AAD B2C</button>
+        <a href="#" onclick="aadb2cLogout();">Sign out</a>
+
+    </div>
+</div>
+}
 
 <h2>Call Azure Functions:</h2>
 The following actions call into our deployed Azure Functions:
@@ -72,6 +90,20 @@ The following actions call into the EasyAuth endpoints:
 
 
 <script src="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0.js"></script>
+@* TODO - move to the bottom and retest! *@
+@if (useAadB2c) 
+{
+<!-- This app uses cdn to reference msal.js (recommended). 
+     You can also download it from: https://github.com/AzureAD/microsoft-authentication-library-for-js -->
+<script src="https://secure.aadcdn.microsoftonline-p.com/lib/0.1.3/js/msal.js"></script>
+
+@*
+<!-- The 'bluebird' and 'fetch' references below are required if you need to run this application on Internet Explorer -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js"></script>
+*@
+}
+
 <script>
     var functionAppBaseUrl = '@functionAppBaseUrl';
     var mobileClient = new WindowsAzure.MobileServiceClient(functionAppBaseUrl);
@@ -102,12 +134,7 @@ The following actions call into the EasyAuth endpoints:
                 log(`In facebook callback: ${JSON.stringify(response)}`);
                 if (response === undefined || response.status.toLowerCase() === 'connected') {
                     var accessToken = response.authResponse.accessToken;
-                    mobileClient.login('facebook', { 'access_token': accessToken }, false)
-                        .then(function () {
-                            console.log('TODO - could enable/disable functionality etc')
-                        }, function (error) {
-                            console.log(`ERROR: ${error}`);
-                        });
+                    translateAuthToken('facebook', { 'access_token': accessToken });
                 } else {
                     // TODO - think about how to handle FB logout vs page load when logged out
                 }
@@ -136,22 +163,96 @@ The following actions call into the EasyAuth endpoints:
         function onGoogleLogin(googleUser) {
             console.log(googleUser.getAuthResponse());
             var id_token = googleUser.getAuthResponse().id_token;
-            mobileClient.login('google', { 'id_token': id_token }, false)
-                .then(function () {
-                    console.log('TODO - could enable/disable functionality etc')
-                }, function (error) {
-                    console.log(`ERROR: ${error}`);
-                });
+            translateAuthToken('google', { 'id_token': id_token });
         };
         function googleSignOut() {
             var auth2 = gapi.auth2.getAuthInstance();
             auth2.signOut().then(function () {
-                console.log('User signed out.');
+                log('User signed out.');
             });
             mobileClient.logout();
         }
         </text>
     }
+    @if(useAadB2c)
+    {
+        <text>
+            var aadb2cHandlingLoginCallback = false;
+            function aadb2cLogin(){
+                log('Starting AAD B2C login...');
+                aadb2cHandlingLoginCallback = false;
+                aadb2cClientApplication.loginPopup(scopes).then(function (idToken) {
+                    aadb2cClientApplication.acquireTokenSilent(scopes).then(function (accessToken) {
+                        log('acquireTokenSilent - got token');
+                        onAadb2cLogin(accessToken);
+                    }, function (error) {
+                        log(`acquireTokenSilent - error: ${error}`);
+                        aadb2cClientApplication.acquireTokenPopup(scopes).then(function (accessToken) {
+                            log("acquireTokenPopup - got token");
+                            onAadb2cLogin(accessToken);
+                        }, function (error) {
+                            log(`acquireTokenPopup - error: ${error}`);
+                        });
+                    });
+                }, function (error) {
+                    log("Error during login:\n" + error);
+                });
+            }
+            function aadb2cLoginCallback (errorDesc, token, error, tokenType) {
+                // Called after loginRedirect or acquireTokenPopup
+                log("B2C callback");
+                if (error ===undefined){
+                    aadb2cHandlingLoginCallback = true;
+                    onAadb2cLogin(token);
+                }
+                else{
+                    log(`Error: ${error}||${errorDesc}`);
+                }
+            }
+            function onAadb2cLogin(token){
+                log(`Token: ${token}`);
+                translateAuthToken('aad', { 'access_token': token });
+            }
+            function aadb2cLogout(){
+                aadb2cClientApplication.logout();
+            }
+            var scopes = [ @Html.Raw(aadb2cScopeString) ];
+            var aadb2cClientApplication = new Msal.UserAgentApplication('@aadb2cClientId', '@aadb2cAuthority', aadb2cLoginCallback,{
+                redirectUri: aadb2cRedirectUri
+            }); 
+            //Previous version of msal uses redirect url via a property
+            if (aadb2cClientApplication.redirectUri) {
+                aadb2cClientApplication.redirectUri = msalconfig.redirectUri;
+            }
+
+
+            window.onload = function () {
+                log(`onload: aadb2cHandlingLoginCallback = ${aadb2cHandlingLoginCallback}`);
+                // If page is refreshed, continue to display user info
+                if (!aadb2cClientApplication.isCallback(window.location.hash) && window.parent === window && !window.opener
+                        && !aadb2cHandlingLoginCallback) {
+                    var user = aadb2cClientApplication.getUser();
+                    if (user) {
+                        log('Got AAD B2C user. Calling login...');
+                        // aadb2cLogin();
+                        aadb2cClientApplication.acquireTokenSilent(scopes, null, user).then(function (accessToken) {
+                            log('acquireTokenSilent - got token');
+                            onAadb2cLogin(accessToken);
+                        }, function (error) {
+                            log(`acquireTokenSilent - error: ${error}`);
+                            aadb2cClientApplication.acquireTokenPopup(scopes).then(function (accessToken) {
+                                log("acquireTokenPopup - got token");
+                                onAadb2cLogin(accessToken);
+                            }, function (error) {
+                                log(`acquireTokenPopup - error: ${error}`);
+                            });
+                        });
+                    }
+                }
+            }
+        </text>
+    }
+
 
     var logElement = document.getElementById('log');
     function clearLog() {
@@ -159,6 +260,16 @@ The following actions call into the EasyAuth endpoints:
     }
     function log(message) {
         logElement.innerText += message + '\r\n';
+    }
+
+    function translateAuthToken(provider, body){
+          mobileClient.login(provider, body, false)
+            .then(function () {
+                console.log('TODO - could enable/disable functionality etc')
+                log('Done');
+            }, function (error) {
+                log(`ERROR: ${error}`);
+            });
     }
     function callIsAuthenticated() {
         mobileClient.invokeApi(`${functionAppBaseUrl}api/IsAuthenticated`,
@@ -255,3 +366,4 @@ The following actions call into the EasyAuth endpoints:
 {
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 }
+    
