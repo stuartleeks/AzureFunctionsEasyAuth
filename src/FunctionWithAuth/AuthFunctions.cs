@@ -72,8 +72,15 @@ namespace FunctionWithAuth
             if (Thread.CurrentPrincipal.Identity.IsAuthenticated)
             {
                 var authInfo = await request.GetAuthInfoAsync();
-                // look up specific claim type, in this case the email claim (http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress)
-                var emailClaim = authInfo?.GetClaim(ClaimTypes.Email);
+
+                // look up specific claim types
+                // For Google etc use the email claim (http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress)
+                // For AAD B2C use the "emails" claim (needs to be enabled in the B2C policy)
+                var emailClaim = authInfo
+                                    ?.UserClaims
+                                    .FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "emails");
+
+
                 return request.CreateResponse(HttpStatusCode.OK, emailClaim?.Value, "application/json");
             }
             else

@@ -11,17 +11,6 @@ namespace FunctionWithAuth
         private static HttpClient _httpClient = new HttpClient(); // cache and reuse to avoid repeated creation on Function calls
 
         /// <summary>
-        /// Find a claim of the specified type
-        /// </summary>
-        /// <param name="authInfo"></param>
-        /// <param name="claimType"></param>
-        /// <returns></returns>
-        public static AuthUserClaim GetClaim(this AuthInfo authInfo, string claimType)
-        {
-            return authInfo.UserClaims.FirstOrDefault(c => c.Type == claimType);
-        }
-
-        /// <summary>
         /// Get the EasyAuth properties for the currently authenticated user
         /// </summary>
         /// <param name="request"></param>
